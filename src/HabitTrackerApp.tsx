@@ -31,9 +31,6 @@ import {
 import { motion } from "framer-motion";
 import { createClient, type Session } from "@supabase/supabase-js";
 
-<div className="text-xs text-muted-foreground">
-  Prod env check: URL={import.meta.env.VITE_SUPABASE_URL ? "SET" : "MISSING"} | KEY={import.meta.env.VITE_SUPABASE_ANON_KEY ? "SET" : "MISSING"}
-</div>
 
 /**
  * Habit Tracker (single-file React)
@@ -720,6 +717,11 @@ export default function HabitTrackerApp() {
             <div className="text-sm text-muted-foreground">
               Check "Do" items to add points (+1). Check "Do Not" items to subtract points (-1).
             </div>
+
+<div className="text-xs text-muted-foreground">
+  Prod env check: URL={import.meta.env.VITE_SUPABASE_URL ? "SET" : "MISSING"} | KEY={import.meta.env.VITE_SUPABASE_ANON_KEY ? "SET" : "MISSING"}
+</div>
+
             <div className="mt-1 text-xs text-muted-foreground">{cloudStatus}</div>
           </div>
 
