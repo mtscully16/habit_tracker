@@ -32,7 +32,7 @@ import { motion } from "framer-motion";
 import { createClient, type Session } from "@supabase/supabase-js";
 
 <div className="text-xs text-muted-foreground">
-  Debug env: URL={_dbgUrl ? "SET" : "MISSING"} | KEY={_dbgKey ? "SET" : "MISSING"}
+  Prod env check: URL={import.meta.env.VITE_SUPABASE_URL ? "SET" : "MISSING"} | KEY={import.meta.env.VITE_SUPABASE_ANON_KEY ? "SET" : "MISSING"}
 </div>
 
 /**
