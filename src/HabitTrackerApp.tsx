@@ -1176,8 +1176,7 @@ function runDevTests() {
   );
 }
 
-// eslint-disable-next-line no-undef
-if (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production") {
+if (import.meta.env.DEV) {
   try {
     runDevTests();
   } catch (e) {
