@@ -1,6 +1,3 @@
-const _dbgUrl = import.meta.env.VITE_SUPABASE_URL;
-const _dbgKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +28,14 @@ import {
 import { motion } from "framer-motion";
 import { createClient, type Session } from "@supabase/supabase-js";
 
+// Supabase client (module-scope)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
 
 /**
  * Habit Tracker (single-file React)
@@ -95,8 +100,6 @@ const SUPABASE_ANON_KEY =
   getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY") ||
   getEnv("REACT_APP_SUPABASE_ANON_KEY");
 
-const supabase =
-  SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 function toLocalISODate(d: Date = new Date()): string {
   const year = d.getFullYear();
