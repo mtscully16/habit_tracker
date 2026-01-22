@@ -253,10 +253,11 @@ export default function HabitTrackerApp() {
   const [state, setState] = useState<AppState>(() => getLocalState());
   const [session, setSession] = useState<Session | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
-  const [cloudStatus, setCloudStatus] = useState<string>(() => {
-    if (!supabase) return "Cloud sync disabled (missing Supabase env vars).";
-    return "Cloud sync ready.";
-  });
+ const [cloudStatus, setCloudStatus] = useState<string>(() => {
+  if (!supabase) return "Cloud sync unavailable (Supabase client not initialized).";
+  return "Cloud sync ready.";
+});
+
 
   const cloudUpdatedAtRef = useRef<string | null>(null);
   const lastUploadedHashRef = useRef<string | null>(null);
