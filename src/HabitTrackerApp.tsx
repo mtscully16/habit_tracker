@@ -256,6 +256,7 @@ export default function HabitTrackerApp() {
   const [state, setState] = useState<AppState>(() => getLocalState());
   const [session, setSession] = useState<Session | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
  const [cloudStatus, setCloudStatus] = useState<string>(() => {
   if (!supabase) return "Cloud sync unavailable (Supabase client not initialized).";
   return "Cloud sync ready.";
@@ -750,107 +751,120 @@ export default function HabitTrackerApp() {
               </Button>
             )}
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="rounded-2xl">
-                  <Settings className="mr-2 h-4 w-4" /> Customize
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl rounded-2xl">
-                <DialogHeader>
-                  <DialogTitle>Customize categories</DialogTitle>
-                </DialogHeader>
+            <Dialog open={customizeOpen} onOpenChange={setCustomizeOpen}>
+  <DialogTrigger asChild>
+    <Button variant="outline" className="rounded-2xl">
+      <Settings className="mr-2 h-4 w-4" /> Customize
+    </Button>
+  </DialogTrigger>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-medium">Do (+1)</div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-2xl"
-                        onClick={() => addHabit("positive")}
-                        title="Add a Do item"
-                      >
-                        <Plus className="mr-2 h-4 w-4" /> Add
-                      </Button>
-                    </div>
+  <DialogContent className="max-w-2xl rounded-2xl max-h-[80vh] overflow-hidden flex flex-col">
+    <DialogHeader>
+      <DialogTitle>Customize categories</DialogTitle>
+    </DialogHeader>
 
-                    {state.settings.positive.map((label, i) => (
-                      <div key={`p-${i}`} className="flex items-end gap-2">
-                        <div className="flex-1 space-y-1">
-                          <Label className="text-xs text-muted-foreground">#{i + 1}</Label>
-                          <Input
-                            value={label}
-                            onChange={(e) => updateHabitLabel("positive", i, e.target.value)}
-                            className="rounded-xl"
-                            maxLength={60}
-                          />
-                        </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="rounded-2xl"
-                          onClick={() => removeHabit("positive", i)}
-                          title={state.settings.positive.length <= 1 ? "Keep at least one item" : "Remove"}
-                          disabled={state.settings.positive.length <= 1}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+    {/* Scrollable content area */}
+    <div className="flex-1 overflow-y-auto pr-1">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Do (+1) */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-sm font-medium">Do (+1)</div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-2xl"
+              onClick={() => addHabit("positive")}
+              title="Add a Do item"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add
+            </Button>
+          </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-sm font-medium">Do Not (-1)</div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-2xl"
-                        onClick={() => addHabit("negative")}
-                        title="Add a Do Not item"
-                      >
-                        <Plus className="mr-2 h-4 w-4" /> Add
-                      </Button>
-                    </div>
+          {state.settings.positive.map((label, i) => (
+            <div key={`p-${i}`} className="flex items-end gap-2">
+              <div className="flex-1 space-y-1">
+                <Label className="text-xs text-muted-foreground">#{i + 1}</Label>
+                <Input
+                  value={label}
+                  onChange={(e) => updateHabitLabel("positive", i, e.target.value)}
+                  className="rounded-xl"
+                  maxLength={60}
+                />
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-2xl"
+                onClick={() => removeHabit("positive", i)}
+                title={state.settings.positive.length <= 1 ? "Keep at least one item" : "Remove"}
+                disabled={state.settings.positive.length <= 1}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
 
-                    {state.settings.negative.map((label, i) => (
-                      <div key={`n-${i}`} className="flex items-end gap-2">
-                        <div className="flex-1 space-y-1">
-                          <Label className="text-xs text-muted-foreground">#{i + 1}</Label>
-                          <Input
-                            value={label}
-                            onChange={(e) => updateHabitLabel("negative", i, e.target.value)}
-                            className="rounded-xl"
-                            maxLength={60}
-                          />
-                        </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="rounded-2xl"
-                          onClick={() => removeHabit("negative", i)}
-                          title={state.settings.negative.length <= 1 ? "Keep at least one item" : "Remove"}
-                          disabled={state.settings.negative.length <= 1}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        {/* Do Not (-1) */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-sm font-medium">Do Not (-1)</div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-2xl"
+              onClick={() => addHabit("negative")}
+              title="Add a Do Not item"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add
+            </Button>
+          </div>
 
-                <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                  <Button variant="ghost" onClick={resetHabitLabels} className="rounded-2xl">
-                    <RotateCcw className="mr-2 h-4 w-4" /> Reset labels
-                  </Button>
-                  <Button variant="outline" className="rounded-2xl">
-                    Done
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+          {state.settings.negative.map((label, i) => (
+            <div key={`n-${i}`} className="flex items-end gap-2">
+              <div className="flex-1 space-y-1">
+                <Label className="text-xs text-muted-foreground">#{i + 1}</Label>
+                <Input
+                  value={label}
+                  onChange={(e) => updateHabitLabel("negative", i, e.target.value)}
+                  className="rounded-xl"
+                  maxLength={60}
+                />
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-2xl"
+                onClick={() => removeHabit("negative", i)}
+                title={state.settings.negative.length <= 1 ? "Keep at least one item" : "Remove"}
+                disabled={state.settings.negative.length <= 1}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Footer stays visible */}
+    <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+      <Button variant="ghost" onClick={resetHabitLabels} className="rounded-2xl">
+        <RotateCcw className="mr-2 h-4 w-4" /> Reset labels
+      </Button>
+
+      <Button
+        variant="outline"
+        className="rounded-2xl"
+        onClick={() => setCustomizeOpen(false)}
+      >
+        Done
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
           </div>
         </motion.div>
 
