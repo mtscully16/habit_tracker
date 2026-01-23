@@ -28,6 +28,15 @@ import {
 import { motion } from "framer-motion";
 import { createClient, type Session } from "@supabase/supabase-js";
 
+// Supabase client (module-scope)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+const supabase =
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null;
+
 /**
  * Habit Tracker (single-file React)
  * - Do habits (+1 when checked)
@@ -91,8 +100,6 @@ const SUPABASE_ANON_KEY =
   getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY") ||
   getEnv("REACT_APP_SUPABASE_ANON_KEY");
 
-const supabase =
-  SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 function toLocalISODate(d: Date = new Date()): string {
   const year = d.getFullYear();
@@ -249,12 +256,11 @@ export default function HabitTrackerApp() {
   const [state, setState] = useState<AppState>(() => getLocalState());
   const [session, setSession] = useState<Session | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
-  const [cloudStatus, setCloudStatus] = useState<string>(() => {
-    const hasEnv = Boolean(SUPABASE_URL) && Boolean(SUPABASE_ANON_KEY);
-    if (!hasEnv) return "Cloud sync disabled (missing Supabase env vars).";
-    if (!supabase) return "Cloud sync unavailable (Supabase client not initialized).";
-    return "Cloud sync ready.";
-  });
+ const [cloudStatus, setCloudStatus] = useState<string>(() => {
+  if (!supabase) return "Cloud sync unavailable (Supabase client not initialized).";
+  return "Cloud sync ready.";
+});
+
 
   const cloudUpdatedAtRef = useRef<string | null>(null);
   const lastUploadedHashRef = useRef<string | null>(null);
@@ -712,9 +718,10 @@ export default function HabitTrackerApp() {
         >
           <div>
             <div className="text-2xl font-semibold tracking-tight">Daily Habit Tracker</div>
-            <div className="text-sm text-muted-foreground">
-              Check "Do" items to add points (+1). Check "Do Not" items to subtract points (-1).
-            </div>
+            
+
+
+
             <div className="mt-1 text-xs text-muted-foreground">{cloudStatus}</div>
           </div>
 
@@ -749,7 +756,7 @@ export default function HabitTrackerApp() {
                   <Settings className="mr-2 h-4 w-4" /> Customize
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl rounded-2xl max-h-[80vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl rounded-2xl">
                 <DialogHeader>
                   <DialogTitle>Customize categories</DialogTitle>
                 </DialogHeader>
@@ -1171,8 +1178,7 @@ function runDevTests() {
   );
 }
 
-// eslint-disable-next-line no-undef
-if (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production") {
+if (import.meta.env.DEV) {
   try {
     runDevTests();
   } catch (e) {
