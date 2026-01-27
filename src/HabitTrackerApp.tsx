@@ -398,6 +398,53 @@ export default function HabitTrackerApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, session?.user?.id]);
 
+  // Auto-advance selected date at local midnight while app is open
+useEffect(() => {
+  const msUntilNextMidnight = () => {
+    const now = new Date();
+    const next = new Date(now);
+    next.setHours(24, 0, 0, 0); // next local midnight
+    return next.getTime() - now.getTime();
+  };
+
+  const tick = () => {
+    const newToday = toLocalISODate();
+    setState((s) => {
+      if (s.ui.selectedDate === newToday) return s;
+
+      const pLen = s.settings.positive.length;
+      const nLen = s.settings.negative.length;
+
+      const nextDays = { ...s.days };
+      if (!nextDays[newToday]) {
+        nextDays[newToday] = ensureDayShape(null, pLen, nLen);
+      }
+
+      return {
+        ...s,
+        days: nextDays,
+        ui: { ...s.ui, selectedDate: newToday },
+      };
+    });
+  };
+
+  // Correct date immediately on mount
+  tick();
+
+  // Schedule midnight update
+  let timer: number;
+  const schedule = () => {
+    timer = window.setTimeout(() => {
+      tick();
+      schedule();
+    }, msUntilNextMidnight() + 50);
+  };
+  schedule();
+
+  return () => window.clearTimeout(timer);
+}, []);
+
+
   const dayData = state.days[selectedDate] || ensureDayShape(null, posLen, negLen);
 
   const points = useMemo(() => {
